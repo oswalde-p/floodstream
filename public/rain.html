@@ -1,0 +1,31 @@
+<head>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.9.0.min.js"></script>
+</head>
+<body>
+    <div id="gd"></div>
+
+    <script>
+            const OBSERVATIONS_URL = 'http://192.168.20.8:227/observations'
+            const response = axios.get(OBSERVATIONS_URL)
+                .then(response => {
+
+                    const { x, y, location } = response.data
+
+
+                    const layout = {
+                        title: `${location} rainfall since 9am`,
+                        xaxis: {
+                            title: 'Time (UTC)'
+                        },
+                        yaxis: {
+                            title: `rain_trace`
+                        }
+                    }
+                    Plotly.newPlot("gd", /* JSON object */ {
+                        "data": [{ x, y }],
+                        layout
+                    })
+                })
+    </script>
+</body>
