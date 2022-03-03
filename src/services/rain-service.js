@@ -22,11 +22,11 @@ class RainService {
         return {
             x,
             y,
-            location: header[0].name
+            location: header[0].name,
         }
     }
 }
 
 module.exports = {
-    RainService
+    RainService,
 }
