@@ -9,10 +9,20 @@ router.get('/observations', async (req, res) => {
     res.json(data)
 })
 
-router.get('/river-heights/:location', async (req, res) => {
-    const { location } = req.params
+router.get('/location-heights/:bomSiteId', async (req, res) => {
+    const { bomSiteId } = req.params
     try {
-        const data = await RiverHeightService.scrapeBomTable(location)
+        const data = await RiverHeightService.scrapeBomSiteHeight(null, bomSiteId)
+        res.json(data)
+    } catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+router.get('/river-heights/:riverName', async (req, res) => {
+    const { riverName } = req.params
+    try {
+        const data = await RiverHeightService.fetchLatestRiverHeight(riverName)
         res.json(data)
     } catch (err) {
         res.status(500).json(err)

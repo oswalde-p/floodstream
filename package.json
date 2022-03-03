@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev src/index.ts",
-    "serve": "node src/index.js",
+    "serve": "node build/index.js",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
     "build": "tsc"
@@ -15,7 +15,9 @@
   "dependencies": {
     "axios": "^0.21.4",
     "express": "^4.17.3",
+    "http-errors": "^2.0.0",
     "mongodb": "^3.6.6",
+    "morgan": "^1.10.0",
     "nodeplotlib": "^0.7.3",
     "tabletojson": "^2.0.7",
     "tslint": "^6.1.3"

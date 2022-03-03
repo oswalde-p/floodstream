@@ -1,0 +1,41 @@
+{
+    "clarence": {
+        "observation_sites": [
+            {
+                "label": "Grafton (Prince St)",
+                "bomSiteId": "058178",
+                "index": 7
+            },
+            {
+                "label": "Ulmarra",
+                "bomSiteId": "058188",
+                "index": 8
+            },
+            {
+                "label": "Brushgrove",
+                "bomSiteId": "558027",
+                "index": 9
+            },
+            {
+                "label": "Tyndale",
+                "bomSiteId": "558073",
+                "index": 10
+            },
+            {
+                "label": "Lawrence",
+                "bomSiteId": "558110",
+                "index": 11
+            },
+            {
+                "label": "Maclean",
+                "bomSiteId": "558022",
+                "index": 12
+            },
+            {
+                "label": "Yamba",
+                "bomSiteId": "558062",
+                "index": 13
+            }
+        ]
+    }
+}
