@@ -37,8 +37,20 @@ const formatDateString = function(date: Date) {
 
 const parseDateString = function(dateStr: string) {
     const [ day, month, year ] = dateStr.substring(0, 11).split('/')
-    console.log({day, month, year})
     return new Date(Number(year), Number(month) - 1, Number(day))
+}
+
+const processMeasurement = function(measurement: any) {
+    if (!measurement) {
+        return {
+            time: null,
+            level: null
+        }
+    }
+    return {
+        time: parseDateString(measurement['Station Date/Time']),
+        level: Number(measurement['Water Level(m)'])
+    }
 }
 
 {class RiverHeightService {
@@ -58,14 +70,8 @@ const parseDateString = function(dateStr: string) {
             const previous = measurements.find(m => m['Station Date/Time'] === previousTime)
             data.push({ 
                 label: site.label, 
-                now: {
-                    time: parseDateString(now['Station Date/Time']),
-                    level: Number(now['Water Level(m)'])
-                },
-                previous: {
-                    time: parseDateString(previous['Station Date/Time']),
-                    level: Number(previous['Water Level(m)'])
-                }
+                now: processMeasurement(now),
+                previous: processMeasurement(previous)
             })
          })
         await Promise.all(promises)
@@ -75,7 +81,7 @@ const parseDateString = function(dateStr: string) {
                 label: location.label,
                 time: location.now.time,
                 level: location.now.level,
-                delta: Math.round((location.now.level - location.previous.level) * 100) / 100
+                delta: location.previous.level ? Math.round((location.now.level - location.previous.level) * 100) / 100 : null
             })),
             previous: sorted.map(location => ({
                 label: location.label,

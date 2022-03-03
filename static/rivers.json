@@ -2,6 +2,41 @@
     "clarence": {
         "observation_sites": [
             {
+                "label": "Lilydale",
+                "bomSiteId": "557005",
+                "index": 0
+            },
+            {
+                "label": "Orara R at Orange Grove",
+                "bomSiteId": "559018",
+                "index": 1
+            },
+            {
+                "label": "Orara R at Karangi",
+                "bomSiteId": "559023",
+                "index": 2
+            },
+            {
+                "label": "Orara R at Glenreagh TM",
+                "bomSiteId": "559066",
+                "index": 3
+            },
+            {
+                "label": "Orara R at Coutts Crossing",
+                "bomSiteId": "558030",
+                "index": 4
+            },
+            {
+                "label": "Orara R at Bawden Bridge",
+                "bomSiteId": "558074",
+                "index": 5
+            },
+            {
+                "label": "Rogans Br",
+                "bomSiteId": "558055",
+                "index": 6
+            },
+            {
                 "label": "Grafton (Prince St)",
                 "bomSiteId": "058178",
                 "index": 7

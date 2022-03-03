@@ -1,0 +1,40 @@
+<head>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.9.0.min.js"></script>
+</head>
+<body>
+    <div id="gd"></div>
+
+    <script>
+            const OBSERVATIONS_URL = 'http://192.168.20.8:227/river-heights/clarence'
+            const response = axios.get(OBSERVATIONS_URL)
+                .then(response => {
+
+                    const { now, previous } = response.data
+                    const nowPlot = {
+                        x: now.map(site => site.label),
+                        y: now.map(site => site.level),
+                        name: 'Now'
+                    }
+                    const previousPlot = {
+                        x: previous.map(site => site.label),
+                        y: previous.map(site => site.level),
+                        name: 'Yesterday'
+                    }
+
+                    const layout = {
+                        title: `River Heights ${new Date(now[0].time).toLocaleString()}`,
+                        xaxis: {
+                            title: 'Location'
+                        },
+                        yaxis: {
+                            title: `Height (m)`
+                        }
+                    }
+                    Plotly.newPlot("gd", /* JSON object */ {
+                        "data": [nowPlot, previousPlot],
+                        layout
+                    })
+                })
+    </script>
+</body>
