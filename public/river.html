@@ -6,7 +6,7 @@
     <div id="gd"></div>
 
     <script>
-            const OBSERVATIONS_URL = 'http://192.168.20.8:227/river-heights/clarence?limit=1'
+            const OBSERVATIONS_URL = '/river-heights/clarence?limit=1'
             const response = axios.get(OBSERVATIONS_URL)
                 .then(response => {
                     const { reportData, createdOn, } = response.data[0]
