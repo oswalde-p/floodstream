@@ -55,6 +55,7 @@ class RiverHeightService {
                 sort: ['createdOn', 'descending']
             })
             if (!data) {
+                return
                 throw new Error('No readings found')
             }
             const { heights } = data

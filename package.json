@@ -1,11 +1,12 @@
 {
   "name": "floods",
   "version": "1.0.0",
+  "engines": { "node": "14" },
   "main": "./build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev src/index.ts",
-    "serve": "node build/index.js",
+    "start": "node build/index.js",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
     "build": "tsc"
