@@ -4,72 +4,72 @@
             {
                 "label": "Lilydale",
                 "bomSiteId": "557005",
-                "index": 0
+                "sortIndex": 0
             },
             {
                 "label": "Orara R at Orange Grove",
                 "bomSiteId": "559018",
-                "index": 1
+                "sortIndex": 1
             },
             {
                 "label": "Orara R at Karangi",
                 "bomSiteId": "559023",
-                "index": 2
+                "sortIndex": 2
             },
             {
                 "label": "Orara R at Glenreagh TM",
                 "bomSiteId": "559066",
-                "index": 3
+                "sortIndex": 3
             },
             {
                 "label": "Orara R at Coutts Crossing",
                 "bomSiteId": "558030",
-                "index": 4
+                "sortIndex": 4
             },
             {
                 "label": "Orara R at Bawden Bridge",
                 "bomSiteId": "558074",
-                "index": 5
+                "sortIndex": 5
             },
             {
                 "label": "Rogans Br",
                 "bomSiteId": "558055",
-                "index": 6
+                "sortIndex": 6
             },
             {
                 "label": "Grafton (Prince St)",
                 "bomSiteId": "058178",
-                "index": 7
+                "sortIndex": 7
             },
             {
                 "label": "Ulmarra",
                 "bomSiteId": "058188",
-                "index": 8
+                "sortIndex": 8
             },
             {
                 "label": "Brushgrove",
                 "bomSiteId": "558027",
-                "index": 9
+                "sortIndex": 9
             },
             {
                 "label": "Tyndale",
                 "bomSiteId": "558073",
-                "index": 10
+                "sortIndex": 10
             },
             {
                 "label": "Lawrence",
                 "bomSiteId": "558110",
-                "index": 11
+                "sortIndex": 11
             },
             {
                 "label": "Maclean",
                 "bomSiteId": "558022",
-                "index": 12
+                "sortIndex": 12
             },
             {
                 "label": "Yamba",
                 "bomSiteId": "558062",
-                "index": 13
+                "sortIndex": 13
             }
         ]
     }

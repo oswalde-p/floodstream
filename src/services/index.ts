@@ -1,7 +1,7 @@
-const { RainService } = require('./rain-service')
-const { RiverHeightService } = require('./river-height-service')
+import { RainService } from './rain-service'
+import { RiverHeightService } from './river-height-service'
 
-module.exports = {
+export {
     RainService,
     RiverHeightService
 }

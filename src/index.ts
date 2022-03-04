@@ -2,6 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const ip = require('ip')
+const { connect, db } = require('./mongo-connection')
 const { router } = require('./router')
 const { httpErrorMiddleware, catchallErrorMiddleware } = require('./middleware/errors')
 
@@ -11,6 +12,8 @@ app.use(cors())
 
 app.use(router)
 app.use(express.static('public'))
+
+connect()
 
 const port = process.env.PORT || 227
 

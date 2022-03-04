@@ -6,24 +6,15 @@
     <div id="gd"></div>
 
     <script>
-            const OBSERVATIONS_URL = 'http://192.168.20.8:227/river-heights/clarence'
+            const OBSERVATIONS_URL = 'http://192.168.20.8:227/river-heights/clarence?limit=1'
             const response = axios.get(OBSERVATIONS_URL)
                 .then(response => {
-
-                    const { now, previous } = response.data
-                    const nowPlot = {
-                        x: now.map(site => site.label),
-                        y: now.map(site => site.level),
-                        name: 'Now'
-                    }
-                    const previousPlot = {
-                        x: previous.map(site => site.label),
-                        y: previous.map(site => site.level),
-                        name: 'Yesterday'
-                    }
+                    const { reportData, createdOn, } = response.data[0]
+                    const x = reportData.map(site => site.label)
+                    const y =  reportData.map(site => site.height)
 
                     const layout = {
-                        title: `River Heights ${new Date(now[0].time).toLocaleString()}`,
+                        title: `River Heights ${new Date(createdOn).toLocaleString()}`,
                         xaxis: {
                             title: 'Location'
                         },
@@ -32,7 +23,7 @@
                         }
                     }
                     Plotly.newPlot("gd", /* JSON object */ {
-                        "data": [nowPlot, previousPlot],
+                        "data": [{ x, y }],
                         layout
                     })
                 })

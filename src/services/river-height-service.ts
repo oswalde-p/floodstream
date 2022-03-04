@@ -1,43 +1,22 @@
-const fs = require('fs')
-const path = require('path')
-const axios = require('axios')
-const httpErrors = require('http-errors')
-const rivers = require('../../static/rivers.json')
-const {Tabletojson: tabletojson} = require('tabletojson')
+import axios from 'axios'
+import * as httpErrors from 'http-errors'
+import {Tabletojson as tabletojson} from 'tabletojson'
+import { DateTime } from 'luxon'
+import  { COLLECTIONS } from '../constants/collections'
+import  { db } from '../mongo-connection'
+import * as rivers from '../../static/rivers.json'
 
-const CACHE_DURATION_MS = 60 * 60 * 1000
-const TIDE_PERIOD_MS = 2 * (12 * 60 * 60 * 1000 + 25 * 60 * 1000) // 2 x 12h 25m
+const RECENTNESS_THRESH = 4 * 60 * 60 * 1000
+// const TIDE_PERIOD_MS = 2 * (12 * 60 * 60 * 1000 + 25 * 60 * 1000) // 2 x 12h 25m
 
 class ObservationSite {
     label: string
     bomSiteId: string
+    sortIndex: number
 }
 
 class River {
     observation_sites: ObservationSite[]
-}
-
-const formatDateString = function(date: Date) {
-    const dateFormatOptions: any = {
-        timeZone: 'Australia/Sydney',
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-    }
-    const timeFormatOptions: any = {
-        hour: 'numeric',
-        minute: 'numeric',
-        timeZone: 'Australia/Sydney',
-        hour12: false
-    }
-    const datePart = new Intl.DateTimeFormat('en-AU', dateFormatOptions).format(date)
-    const timePart = new Intl.DateTimeFormat('en-AU', timeFormatOptions).format(date)
-    return `${datePart} ${timePart}`
-}
-
-const parseDateString = function(dateStr: string) {
-    const [ day, month, year ] = dateStr.substring(0, 11).split('/')
-    return new Date(Number(year), Number(month) - 1, Number(day))
 }
 
 const processMeasurement = function(measurement: any) {
@@ -48,83 +27,95 @@ const processMeasurement = function(measurement: any) {
         }
     }
     return {
-        time: parseDateString(measurement['Station Date/Time']),
+        timestamp: DateTime.fromFormat(measurement['Station Date/Time'], 'dd/MM/yyyy HH:mm', { zone: 'Australia/Sydney' }),
         level: Number(measurement['Water Level(m)'])
     }
 }
 
-{class RiverHeightService {
-    static async fetchLatestRiverHeight(riverName: string, time: Date = new Date(Date.now())) {
+class RiverHeightService {
+    static async getReports(riverName: string, limit: number) {
         const river: River = rivers[riverName]
         if (!river) {
             throw new httpErrors.NotFound('River not found')
         }
-        time.setMinutes(0)
-        time.setSeconds(0)
-        const nowTime = formatDateString(time)
-        const previousTime = formatDateString(new Date(time.getTime() - TIDE_PERIOD_MS))
-        const data = []
-        const promises = river.observation_sites.map(async site => {
-            const { measurements } = await RiverHeightService.scrapeBomSiteHeight(site)
-            const now = measurements.pop()
-            const previous = measurements.find(m => m['Station Date/Time'] === previousTime)
-            data.push({ 
-                label: site.label, 
-                now: processMeasurement(now),
-                previous: processMeasurement(previous)
-            })
-         })
-        await Promise.all(promises)
-        const sorted = data.sort((a,b) => a.index - b.index)
-        return {
-            now: sorted.map(location => ({
-                label: location.label,
-                time: location.now.time,
-                level: location.now.level,
-                delta: location.previous.level ? Math.round((location.now.level - location.previous.level) * 100) / 100 : null
-            })),
-            previous: sorted.map(location => ({
-                label: location.label,
-                time: location.previous.time,
-                level: location.previous.level,
-            }))
+        const reports = await db.collection(COLLECTIONS.REPORTS).find({ riverName }, { sort: {'createdOn': -1 }, limit }).toArray()
+        return reports
+    }
+
+    static async generateReport(riverName: string) {
+        const river: River = rivers[riverName]
+        if (!river) {
+            throw new httpErrors.NotFound('River not found')
         }
+        const reportData = []
+        const promises = river.observation_sites.map(async site => {
+            const data = await db.collection(COLLECTIONS.RIVER_HEIGHT_READINGS).findOne({
+                bomSiteId: site.bomSiteId
+            }, {
+                sort: ['createdOn', 'descending']
+            })
+            if (!data) {
+                throw new Error('No readings found')
+            }
+            const { heights } = data
+            const latest = heights.pop()
+            console.log({latest})
+            if (new Date(latest.timestamp).getTime() < Date.now() - RECENTNESS_THRESH) {
+                console.log('No recent data for ' + site.bomSiteId)
+                return
+            }
+            reportData.push({
+                bomSiteId: site.bomSiteId,
+                label: site.label,
+                sortIndex: site.sortIndex,
+                height: latest.level
+            })
+
+        })
+        await Promise.all(promises)
+        const report = {
+            riverName,
+            createdOn: new Date(Date.now()),
+            reportData: reportData.sort((a, b) => a.sortIndex - b.sortIndex),
+        }
+        await db.collection(COLLECTIONS.REPORTS).insertOne(report)
+    }
+
+    static async scrapeLatestRiverHeight(riverName: string) {
+        const river: River = rivers[riverName]
+        if (!river) {
+            throw new httpErrors.NotFound('River not found')
+        }
+        const promises = river.observation_sites.map(async site => {
+            await RiverHeightService.scrapeBomSiteHeight(site)
+        })
+        await Promise.all(promises)
     }
 
     static async scrapeBomSiteHeight(site?: ObservationSite, bomSiteId?: string) {
         if (!site) {
-            site = rivers.clarence.oversvation_sites.find(os => os.bomSiteId === bomSiteId)
+            site = rivers.clarence.observation_sites.find(os => os.bomSiteId === bomSiteId)
             if (!site) throw new httpErrors.NotFound('Unknown site id')
         }
-        const fileName = path.resolve(__dirname, `../../data/${site.bomSiteId}.json`)
-        try {
-            const existingData = require(fileName)
-            const cacheExpiry = new Date(Date.now() - CACHE_DURATION_MS)
-            if (existingData && new Date(existingData.updatedOn) > cacheExpiry) {
-                console.log('Cache HIT: ', fileName)
-                return existingData
-            } else {
-                console.log('Cache MISS: ', fileName)
-            }
-        } catch(err) {
-            console.log('Cache MISS: ', fileName)
-        }
+        console.log('fetching ' + site.bomSiteId + ' from BOM...')
 
         const url = `http://www.bom.gov.au/fwo/IDN60231/IDN60231.${site.bomSiteId}.tbl.shtml`
         const headers = { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0) Gecko/20100101 Firefox/97.0'}
         const response = await axios.get(url, { headers })
         const converted = tabletojson.convert(response.data)
         const measurements = converted[0]
-        const withMeta = {
-            ...site,
-            updatedOn: new Date(Date.now()),
-            measurements,
-        }
-        fs.writeFileSync(fileName, JSON.stringify(withMeta, null, 2))
-        return withMeta
+        const heights = measurements.map(m => ({
+            ...processMeasurement(m)
+        }))
+        console.log('saving results to db...')
+        db.collection(COLLECTIONS.RIVER_HEIGHT_READINGS).insertOne({ 
+            bomSiteId: site.bomSiteId,
+            heights,
+            createdOn: new Date(Date.now())
+        })
     }
 }
 
-module.exports = {
+export {
     RiverHeightService,
-}}
+}
