@@ -24,7 +24,8 @@
     "morgan": "^1.10.0",
     "nodeplotlib": "^0.7.3",
     "tabletojson": "^2.0.7",
-    "tslint": "^6.1.3"
+    "tslint": "^6.1.3",
+    "typescript": "^4.6.2"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
@@ -34,8 +35,7 @@
     "@typescript-eslint/parser": "^5.13.0",
     "eslint": "^8.10.0",
     "nodemon": "^2.0.15",
-    "ts-node-dev": "^1.1.8",
-    "typescript": "^4.6.2"
+    "ts-node-dev": "^1.1.8"
   },
   "description": "",
   "files": [
