@@ -49,16 +49,17 @@ class RiverHeightService {
         }
         const reportData = []
         const promises = river.observation_sites.map(async site => {
-            const data = await db.collection(COLLECTIONS.RIVER_HEIGHT_READINGS).findOne({
-                bomSiteId: site.bomSiteId
-            }, {
-                sort: ['createdOn', 'descending']
-            })
-            if (!data) {
+            const readings = await db.collection(COLLECTIONS.RIVER_HEIGHT_READINGS)
+                .find({ bomSiteId: site.bomSiteId },
+                { 
+                    sort: {'createdOn': -1 }, 
+                    limit: 1
+                }).toArray()
+            if (!readings || !readings.length) {
+                console.log('No readings found for ' + site.bomSiteId)
                 return
-                throw new Error('No readings found')
             }
-            const { heights } = data
+            const { heights } = readings[0]
             const latest = heights.pop()
             console.log({latest})
             if (new Date(latest.timestamp).getTime() < Date.now() - RECENTNESS_THRESH) {
