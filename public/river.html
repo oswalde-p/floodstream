@@ -6,15 +6,33 @@
     <div id="gd"></div>
 
     <script>
-            const OBSERVATIONS_URL = '/river-heights/clarence?limit=1'
+            const colors = [
+                'rgba(0,0,200,1)',
+                'rgba(0,0,200,0.7)',
+                'rgba(0,0,200,0.4)',
+                'rgba(0,0,200,0.3)',
+                'rgba(0,0,200,0.2)',
+            ]
+            const OBSERVATIONS_URL = '/river-heights/clarence?limit=5'
+            const getPlot = (report, ix) => {
+                const { reportData, createdOn } = report
+                const x = reportData.map(site => site.label)
+                const y =  reportData.map(site => site.height)
+                return {
+                    x,
+                    y,
+                    name: new Date(createdOn).toLocaleString(),
+                    marker: {
+                      color: colors[ix]
+                    }
+                }
+
+            }
             const response = axios.get(OBSERVATIONS_URL)
                 .then(response => {
-                    const { reportData, createdOn, } = response.data[0]
-                    const x = reportData.map(site => site.label)
-                    const y =  reportData.map(site => site.height)
-
+                    const plots = response.data.map(getPlot)
                     const layout = {
-                        title: `River Heights ${new Date(createdOn).toLocaleString()}`,
+                        title: `River Heights - ${response.data[0].riverName.toLocaleUpperCase()}`,
                         xaxis: {
                             title: 'Location'
                         },
@@ -23,7 +41,7 @@
                         }
                     }
                     Plotly.newPlot("gd", /* JSON object */ {
-                        "data": [{ x, y }],
+                        "data": plots,
                         layout
                     })
                 })
