@@ -11,11 +11,13 @@ router.get('/observations', async (req, res) => {
 
 router.post('/fetch-and-generate', async (req, res) => {
     try {
+        res.status(200).send('Generating report, see logs for details')
         await RiverHeightService.scrapeLatestRiverHeight('clarence')
         await RiverHeightService.generateReport('clarence')
-        res.status(200).send()
     } catch(err) {
-        res.status(500).json({ error: err.message })
+        if (!res.headersSent) {
+            res.status(500).json({ error: err.message })
+        }
         throw err
     }
 })
