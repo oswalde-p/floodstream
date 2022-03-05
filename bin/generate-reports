@@ -1,11 +1,14 @@
 #! /app/.heroku/node/bin/node
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { RiverHeightService } = require('../build/src/services/river-height-service')
+const { connect } = require('../build/src/mongo-connection')
 
 const run = async function() {
+  await connect()
   console.log('Fetching and generating for clarence river') //eslint-disable-line no-console
   await RiverHeightService.scrapeLatestRiverHeight('clarence')
   await RiverHeightService.generateReport('clarence')
-  console.log('Report saved successfully')
+  console.log('Report saved successfully') //eslint-disable-line no-console
 }
 
 run()
