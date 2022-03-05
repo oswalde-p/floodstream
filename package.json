@@ -1,8 +1,11 @@
 {
   "name": "floods",
   "version": "1.0.0",
-  "engines": { "node": "14" },
+  "engines": {
+    "node": "14"
+  },
   "main": "./build/src/index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev src/index.ts",

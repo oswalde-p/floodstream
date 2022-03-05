@@ -5,7 +5,7 @@ if (!uri) {
     throw new Error('Missing MONGO_URI environment variable')
 }
 
-const client = new MongoClient(uri, {}) // todo add keys
+const client = new MongoClient(uri, {})
 
 let db: Db
 

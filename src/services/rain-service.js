@@ -1,4 +1,4 @@
-const axios = require('axios')
+import * as axios from 'axios'
 
 const OBSERVATIONS_URL = 'http://www.bom.gov.au/fwo/IDN60801/IDN60801.94589.json' // YAMBA
 
@@ -27,6 +27,6 @@ class RainService {
     }
 }
 
-module.exports = {
+export {
     RainService,
 }
