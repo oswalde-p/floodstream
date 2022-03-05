@@ -57,6 +57,12 @@ class RiverHeightService {
                 }).toArray()
             if (!readings || !readings.length) {
                 console.log('No readings found for ' + site.bomSiteId)
+                reportData.push({
+                    bomSiteId: site.bomSiteId,
+                    label: site.label,
+                    sortIndex: site.sortIndex,
+                    height: null,
+                })
                 return
             }
             const { heights } = readings[0]
@@ -64,6 +70,12 @@ class RiverHeightService {
             console.log({latest})
             if (new Date(latest.timestamp).getTime() < Date.now() - RECENTNESS_THRESH) {
                 console.log('No recent data for ' + site.bomSiteId)
+                reportData.push({
+                    bomSiteId: site.bomSiteId,
+                    label: site.label,
+                    sortIndex: site.sortIndex,
+                    height: null,
+                })
                 return
             }
             reportData.push({
@@ -92,6 +104,7 @@ class RiverHeightService {
             await RiverHeightService.scrapeBomSiteHeight(site)
         })
         await Promise.all(promises)
+        console.log('Report generated successfully')
     }
 
     static async scrapeBomSiteHeight(site?: ObservationSite, bomSiteId?: string) {
