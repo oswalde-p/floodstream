@@ -1,10 +1,26 @@
 <head>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.9.0.min.js"></script>
+    <style>
+        #plotly-stacked, #plotly-slider {
+            min-height: 450px;
+        }
+        #date-picker {
+            display: flex;
+            justify-content: space-between;
+            list-style-type: none;
+        }
+
+        #date-picker li {
+            display: inline-block;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <div id="gd"></div>
-
+    <div id="plotly-stacked"></div>
+    <div id="plotly-slider"></div>
+    <ul id="date-picker"></ul>
     <script>
             const colors = [
                 'rgba(0,0,200,1)',
@@ -40,10 +56,73 @@
                             title: `Height (m)`
                         }
                     }
-                    Plotly.newPlot("gd", /* JSON object */ {
+                    Plotly.newPlot("plotly-stacked", /* JSON object */ {
                         "data": plots,
                         layout
                     })
                 })
+    </script>
+    <script>
+        const days = [
+            { timestamp: '2022-02-27T22:00:00.000Z' },
+            { timestamp: '2022-02-28T22:00:00.000Z' },
+            { timestamp: '2022-03-01T22:00:00.000Z' },
+            { timestamp: '2022-03-02T22:00:00.000Z' },
+            { timestamp: '2022-03-03T22:00:00.000Z' },
+            { timestamp: '2022-03-04T22:00:00.000Z' },
+            { timestamp: '2022-03-05T22:00:00.000Z' },
+        ]
+        let plots
+        function setActivePlot(index) {
+            const layout = {
+                title: `${plots[index].name}`,
+                xaxis: {
+                    title: 'Location'
+                },
+                yaxis: {
+                    title: `Height (m)`,
+                    range: [0, 25]
+                },
+                showLegend: true
+            }
+            const traces = [{
+                ...plots[index],
+                showLegend: true,
+                marker: {
+                    color: colors[0]
+                }
+            }]
+            if (plots[index - 1]) {
+                traces.push({
+                    ...plots[index - 1],
+                    showLegend: true,
+                    marker: {
+                        color: colors[4]
+                    }
+                })
+            }
+            Plotly.newPlot("plotly-slider", {
+                "data": traces,
+                layout
+            })
+
+        }
+        async function setup() {
+            plots = await Promise.all(days.map(async d => {
+                const response = await axios.get(`http://floodstream.herokuapp.com/river-heights/clarence?time=${d.timestamp}`)
+                return getPlot(response.data)
+            }))
+            const datePickerUl = document.getElementById('date-picker')
+            days.forEach((d, ix) => {
+                const li = document.createElement('li')
+                const text = document.createTextNode(new Date(d.timestamp).toLocaleDateString())
+                li.addEventListener('click', () => setActivePlot(ix))
+                li.appendChild(text)
+                datePickerUl.appendChild(li)
+            })
+            console.log(plots)
+            setActivePlot(0)
+        }
+        setup()
     </script>
 </body>
