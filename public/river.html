@@ -13,15 +13,15 @@
                 'rgba(0,0,200,0.3)',
                 'rgba(0,0,200,0.2)',
             ]
-            const OBSERVATIONS_URL = '/river-heights/clarence?limit=5'
+            const OBSERVATIONS_URL = '/river-heights/clarence/recent?limit=5'
             const getPlot = (report, ix) => {
-                const { reportData, createdOn } = report
+                const { reportData, time } = report
                 const x = reportData.map(site => site.label)
                 const y =  reportData.map(site => site.height)
                 return {
                     x,
                     y,
-                    name: new Date(createdOn).toLocaleString(),
+                    name: new Date(time).toLocaleString(),
                     marker: {
                       color: colors[ix]
                     }

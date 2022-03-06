@@ -7,7 +7,7 @@ const run = async function() {
   await connect()
   console.log('Fetching and generating for clarence river') //eslint-disable-line no-console
   await RiverHeightService.scrapeLatestRiverHeight('clarence')
-  await RiverHeightService.generateReport('clarence')
+  await RiverHeightService.combineReadingsAllSites('clarence')
   console.log('Report saved successfully') //eslint-disable-line no-console
 }
 
